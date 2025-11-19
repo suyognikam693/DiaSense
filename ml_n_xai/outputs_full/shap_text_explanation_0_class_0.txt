@@ -1,0 +1,15 @@
+Sample 0_class_0: predicted class=0, probability=0.9998 (base=0.3890)
+Top feature contributions (feature=value -> effect on probability):
+- Age=-2.0542627516477947 increases probability by +0.3863
+- PhysHlth=1.4033081680292958 increases probability by +0.0901
+- BMI=0.1293701510217585 increases probability by +0.0324
+- GenHlth=-0.2552105593170031 increases probability by +0.0303
+- HighBP=-0.7483590224538077 increases probability by +0.0224
+- MentHlth=-0.0739066109666248 increases probability by +0.0203
+- Fruits=-1.369386157534158 increases probability by +0.0180
+- Income=-1.1463199218211149 increases probability by +0.0178
+- HighChol=-0.7524353606245084 increases probability by +0.0120
+- Education=-0.3194364081694956 increases probability by +0.0072
+Base probability: 0.3890
+Sum of contributions: +0.6109
+Output probability (base + contributions): 0.9998

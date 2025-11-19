@@ -1,0 +1,71 @@
+Explainer info:
+- source: built
+- type: tree
+- background_rows: 300
+
+Sample index: 0
+Predicted probabilities per class:
+  Class 0: 0.999842
+  Class 1: 0.000158
+Predicted class: 0
+
+Base (expected) probabilities (prior before seeing this sample's feature values):
+  Class 0 base: 0.477297
+  Class 1 base: 0.522703
+
+Reconstruction (base + sum(feature contributions)) for focal classes:
+  Class 1: 0.000158 (base 0.522703 + sum -0.522545)
+  Class 0: 0.999842 (base 0.477297 + sum +0.522545)
+Note: For binary models with a single SHAP vector, class 0 contributions are inferred as opposites.
+
+Per-feature contributions (sorted by absolute impact toward class 1):
+Columns: 
+rank | feature              | raw_value           | shap(class1) | shap(class0) | direction_class1      | direction_class0      | abs(class1) | %abs_total(class1)
+01   | Age                  | -2.0542627516477947 | -0.326139    | +0.326139    | pushes toward class 0 | supports class 0      | 0.326139    | 59.656%
+02   | PhysHlth             | 1.4033081680292958  | -0.084289    | +0.084289    | pushes toward class 0 | supports class 0      | 0.084289    | 15.418%
+03   | GenHlth              | -0.2552105593170031 | -0.031442    | +0.031442    | pushes toward class 0 | supports class 0      | 0.031442    | 5.751%
+04   | Fruits               | -1.369386157534158  | -0.020595    | +0.020595    | pushes toward class 0 | supports class 0      | 0.020595    | 3.767%
+05   | BMI                  | 0.1293701510217585  | -0.017536    | +0.017536    | pushes toward class 0 | supports class 0      | 0.017536    | 3.208%
+06   | MentHlth             | -0.0739066109666248 | -0.015127    | +0.015127    | pushes toward class 0 | supports class 0      | 0.015127    | 2.767%
+07   | Income               | -1.1463199218211149 | -0.012386    | +0.012386    | pushes toward class 0 | supports class 0      | 0.012386    | 2.266%
+08   | HighChol             | -0.7524353606245084 | -0.011853    | +0.011853    | pushes toward class 0 | supports class 0      | 0.011853    | 2.168%
+09   | HighBP               | -0.7483590224538077 | -0.007979    | +0.007979    | pushes toward class 0 | supports class 0      | 0.007979    | 1.460%
+10   | Sex                  | 1.0506248277415375  | -0.004857    | +0.004857    | pushes toward class 0 | supports class 0      | 0.004857    | 0.888%
+11   | Veggies              | 0.3546744640590293  | +0.004463    | -0.004463    | supports class 1      | pushes toward class 1 | 0.004463    | 0.816%
+12   | HeartDiseaseorAttack | -0.1744227577837352 | +0.002452    | -0.002452    | supports class 1      | pushes toward class 1 | 0.002452    | 0.449%
+13   | Education            | -0.3194364081694956 | -0.002417    | +0.002417    | pushes toward class 0 | supports class 0      | 0.002417    | 0.442%
+14   | PhysActivity         | 0.3701107666813436  | +0.002377    | -0.002377    | supports class 1      | pushes toward class 1 | 0.002377    | 0.435%
+15   | Smoker               | -0.7627294679723385 | +0.001763    | -0.001763    | supports class 1      | pushes toward class 1 | 0.001763    | 0.323%
+16   | HvyAlcoholConsump    | -0.2156782204019787 | +0.000310    | -0.000310    | supports class 1      | pushes toward class 1 | 0.000310    | 0.057%
+17   | AnyHealthcare        | 0.1033612435606589  | +0.000252    | -0.000252    | supports class 1      | pushes toward class 1 | 0.000252    | 0.046%
+18   | DiffWalk             | -0.2111092849420516 | +0.000226    | -0.000226    | supports class 1      | pushes toward class 1 | 0.000226    | 0.041%
+19   | NoDocbcCost          | -0.1413021842634714 | +0.000167    | -0.000167    | supports class 1      | pushes toward class 1 | 0.000167    | 0.031%
+20   | CholCheck            | 0.1323057944218076  | +0.000066    | -0.000066    | supports class 1      | pushes toward class 1 | 0.000066    | 0.012%
+21   | Stroke               | -0.0993020309539011 | +0.000000    | +0.000000    | pushes toward class 0 | pushes toward class 1 | 0.000000    | 0.000%
+
+Cumulative contribution coverage (class 1 focus):
+  Top  1 features explain 59.66% of total absolute impact.
+  Top  3 features explain 80.83% of total absolute impact.
+  Top  5 features explain 87.80% of total absolute impact.
+  Top 10 features explain 97.35% of total absolute impact.
+  Top 21 features explain 100.00% of total absolute impact.
+
+Interpretation guide:
+- SHAP values > 0 for class 1 increase probability of class 1 relative to base.
+- SHAP values < 0 for class 1 decrease probability of class 1 (thus favor class 0).
+- Magnitude indicates strength; percentage column shows relative share of total influence.
+- Direction columns summarize push toward each class.
+- Base probability is the model's expectation before seeing this specific feature vector.
+
+Feature importance narrative (top 5 toward class 1):
+- Age (value=-2.0542627516477947) is lowering class 1 probability by -0.326139 (rank 1, 59.66% of total impact).
+- PhysHlth (value=1.4033081680292958) is lowering class 1 probability by -0.084289 (rank 2, 15.42% of total impact).
+- GenHlth (value=-0.2552105593170031) is lowering class 1 probability by -0.031442 (rank 3, 5.75% of total impact).
+- Fruits (value=-1.369386157534158) is lowering class 1 probability by -0.020595 (rank 4, 3.77% of total impact).
+- BMI (value=0.1293701510217585) is lowering class 1 probability by -0.017536 (rank 5, 3.21% of total impact).
+
+Sanity checks:
+- Sum of class 1 SHAP contributions: -0.522545
+- (Base class 1 + sum) matches reconstructed probability: 0.000158
+- Class 0 probability ≈ 1 - class 1 probability: 0.999842 (compare 0.999842)
+SHAP value layout detected: samples,features,classes
