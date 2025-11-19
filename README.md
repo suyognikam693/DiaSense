@@ -1,3 +1,6 @@
+#DiaSense
+
+AI-driven approach to identify individuals at risk of undiagnosed diabetes using only non-clinical data such as lifestyle habits, sleep patterns, and socioeconomic factors. By eliminating the need for invasive or laboratory-based inputs, the model aims to enable scalable, low-cost early screening, particularly in resource-limited settings.
 
   # Homepage UI for Diabetes App
 
