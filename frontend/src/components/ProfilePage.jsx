@@ -26,10 +26,20 @@ export function ProfilePage({ user, onUpdateUserData, setUser, onNavigateToHome 
         if (assessments.length > 0) {
           const a = assessments[0];
 
-          setUser(prev => ({
+          setUser(prev => {
+            if (prev.healthData) return prev;
+            return {
             ...prev,
             riskScore: a.risk_score,
             healthData: {
+              id: a.id,
+              age: a.age,
+              sex: a.sex,
+              educationLevel: a.education_level,
+              incomeLevel: a.income_level,
+              weight: a.weight,
+              height: a.height,
+              cholCheck: a.chol_check,
               diabetesStatus: a.diabetes_status,
               highBP: a.high_bp ? "1" : "0",
               highChol: a.high_chol ? "1" : "0",
@@ -68,17 +78,20 @@ export function ProfilePage({ user, onUpdateUserData, setUser, onNavigateToHome 
 
               ageCategory: a.age_category,
             },
-          }));
+          
+          };
+        });
         }
       } catch (err) {
         console.error(err);
       }
     };
 
-    if (user?.id) {
-      loadAssessment();
+    if (!user?.id) {
+      return;
     }
-  }, [user.id]);
+    loadAssessment();
+  }, [user?.id]);
 
   
   // New loading states for backend operations
@@ -91,19 +104,32 @@ export function ProfilePage({ user, onUpdateUserData, setUser, onNavigateToHome 
     return Math.min(risk, 100);
   };
 
-  const handleSubmitHealthData = async (data) => {
+  const handleSubmitHealthData = async (data, predictionResult) => {
+  const riskScore = predictionResult?.risk_score || 0;
   setIsSaving(true);
 
   try {
-    const response = await fetch("http://localhost:5000/api/assessment", {
-      method: "POST",
+    const isUpdate = !!user.healthData?.id;
+
+    const response = await fetch(
+      isUpdate
+        ? `http://localhost:5000/api/assessment/${user.healthData.id}`
+        : "http://localhost:5000/api/assessment",
+      {
+        method: isUpdate ? "PUT" : "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         user_id: user.id,
-        risk_score: 0, // or remove if your ML model returns it
-
+        risk_score: riskScore, // or remove if your ML model returns it
+        age: data.age,
+        sex: data.sex,
+        education_level: data.educationLevel,
+        income_level: data.incomeLevel,
+        weight: data.weight,
+        height: data.height,
+        chol_check: data.cholCheck === "1",
         diabetes_status: data.diabetesStatus,
         high_bp: data.highBP === "1",
         high_chol: data.highChol === "1",

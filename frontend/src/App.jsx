@@ -64,9 +64,9 @@ export default function App() {
           }
         />
 
-        {/* Dashboard */}
+        {/* 1. Add the /* to the dashboard path */}
         <Route
-          path="/dashboard"
+          path="/dashboard/*"
           element={
             <ProtectedRoute>
               <Dashboard
@@ -78,9 +78,8 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-        
 
-        {/* Profile */}
+        {/* 2. Add setUser={setUser} to the ProfilePage */}
         <Route
           path="/profile"
           element={
@@ -88,11 +87,12 @@ export default function App() {
               <ProfilePage
                 user={user}
                 onUpdateUserData={updateUserData}
+                setUser={setUser} 
               />
             </ProtectedRoute>
           }
         />
-
+        
         {/* Diet Planner */}
         <Route
           path="/diet-planner"
