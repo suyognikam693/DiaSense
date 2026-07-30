@@ -2,6 +2,7 @@
 import os
 import pickle
 import argparse
+import json
 
 import numpy as np
 import pandas as pd
@@ -402,17 +403,28 @@ if n_classes == 2:
     lines.append(f"- Class 0 probability ≈ 1 - class 1 probability: {1 - reconstructed_prob_class1:.6f} (compare {reconstructed_prob_class0:.6f})")
 lines.append(f"SHAP value layout detected: {layout_info.get('layout')}")
 
-# ===== Write Explanation File =====
-text_path = os.path.join(
-    args.output_dir,
-    f"shap_explanation_detailed_sample_{sample_index}.txt"
-)
-with open(text_path, "w", encoding="utf-8") as fh:
-    fh.write("\n".join(lines))
+# ===== Write Explanation File (JSON) =====
+json_path = os.path.join(args.output_dir, f"shap_explanation_sample_{sample_index}.json")
+json_data = {
+    "confidence": reconstructed_prob_class1,
+    "features": [
+        {
+            "feature": r["feature"],
+            "value": r["value"],
+            "shap_class1": r["towards_class_1"],
+            "rank": int(r["rank_class_1"]),
+            "pct_abs_class1": r["pct_abs_1"],
+            "direction_class1": r["direction_class_1"]
+        }
+        for _, r in df.iterrows()
+    ]
+}
+with open(json_path, "w", encoding="utf-8") as fh:
+    json.dump(json_data, fh, ensure_ascii=False, indent=2)
 
 # ===== Output Summary =====
-print("SHAP detailed explanation saved:")
-print(f" - {text_path}")
+print("SHAP JSON explanation saved:")
+print(f" - {json_path}")
 if expl_meta.get("bundle_saved_to"):
     print(f"Reusable explainer bundle saved: {expl_meta['bundle_saved_to']}")
 if expl_meta.get("bundle_path"):

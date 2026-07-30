@@ -1,8 +1,16 @@
 import pg from 'pg';
 import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
 dotenv.config();
 
 const { Pool } = pg;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const schemaPath = path.join(__dirname, 'schema.sql');
+const requiredTables = ['users', 'health_assessments'];
 
 // Check if we are in a production environment
 const isProduction = process.env.NODE_ENV === 'production';
@@ -24,18 +32,31 @@ const pool = new Pool(
     }
 );
 
-// Test the connection immediately on startup
-pool.query('SELECT NOW()', (err, res) => {
-    if (err) {
-        console.error('Failed to connect to the database:', err.message);
-    } else {
-        console.log('Successfully connected to the database.');
-    }
-});
-
 pool.on('error', (err) => {
     console.error("Unexpected pg pool error", err);
     process.exit(-1); // It is good practice to exit if the pool fails completely
 });
+
+export async function initializeDatabase() {
+    const { rows } = await pool.query(
+        `SELECT table_name
+         FROM information_schema.tables
+         WHERE table_schema = 'public'
+           AND table_name = ANY($1::text[])`,
+        [requiredTables]
+    );
+
+    const existingTables = new Set(rows.map((row) => row.table_name));
+    const missingTables = requiredTables.filter((tableName) => !existingTables.has(tableName));
+
+    if (missingTables.length > 0) {
+        const schemaSql = fs.readFileSync(schemaPath, 'utf8');
+        await pool.query(schemaSql);
+        console.log(`Database schema initialized: ${missingTables.join(', ')}`);
+    }
+
+    await pool.query('SELECT NOW()');
+    console.log('Successfully connected to the database.');
+}
 
 export default pool;

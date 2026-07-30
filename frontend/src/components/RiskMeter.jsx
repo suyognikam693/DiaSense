@@ -1,4 +1,3 @@
-import { Progress } from './ui/progress';
 import { AlertTriangle, CheckCircle, AlertCircle } from 'lucide-react';
 
 export function RiskMeter({ riskScore }) {
@@ -35,10 +34,9 @@ export function RiskMeter({ riskScore }) {
 
       {/* Visual Meter */}
       <div className="space-y-3">
-        <div className="relative">
-          <Progress value={riskScore} className="h-8" />
+        <div className="relative h-8 overflow-hidden rounded-full bg-gray-200">
           <div 
-            className={`absolute top-0 left-0 h-8 rounded-full transition-all duration-1000 ${getProgressColor(riskScore)}`}
+            className={`h-full rounded-full transition-all duration-1000 ${getProgressColor(riskScore)}`}
             style={{ width: `${riskScore}%` }}
           />
         </div>

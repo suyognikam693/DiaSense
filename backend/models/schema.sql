@@ -1,15 +1,21 @@
+-- Enable UUID generation used by the table defaults
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 -- Users Table
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
+    password TEXT NOT NULL,
     profile_picture TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+ALTER TABLE users ADD COLUMN IF NOT EXISTS password TEXT;
+
 -- Health Assessments Table
-CREATE TABLE health_assessments (
+CREATE TABLE IF NOT EXISTS health_assessments (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     risk_score DECIMAL(5,2),

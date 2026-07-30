@@ -4,10 +4,12 @@ import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Activity, Heart, TrendingDown, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { getActionableRiskFactors } from './riskInsights';
 
 export function HomePage({ user }) {
   const navigate = useNavigate();
   const hasCompletedAssessment = user?.healthData && user?.riskScore !== undefined;
+  const actionableRiskFactors = getActionableRiskFactors(user?.riskFactors || []);
 
   // Reusable text gradient styles
   const purplePinkGradientText = {
@@ -22,6 +24,11 @@ export function HomePage({ user }) {
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     margin: 0
+  };
+
+  const formatMetric = (value, digits = 1) => {
+    const parsed = Number.parseFloat(value);
+    return Number.isFinite(parsed) ? parsed.toFixed(digits) : 'N/A';
   };
 
   // Determine risk icon color
@@ -97,15 +104,18 @@ export function HomePage({ user }) {
             </h3>
             
             {(() => {
-              const bmi = parseFloat(user.healthData.bmi);
-              const glucoseBefore = parseFloat(user.healthData.glucoseLevelBeforeFasting);
-              const glucoseAfter = parseFloat(user.healthData.glucoseLevelAfterFasting);
+              const bmi = Number.parseFloat(user.healthData.bmi);
+              const glucoseBefore = Number.parseFloat(user.healthData.glucoseLevelBeforeFasting);
+              const glucoseAfter = Number.parseFloat(user.healthData.glucoseLevelAfterFasting);
               const systolicBP = user.healthData.highBP === '1';
               const cholesterol = user.healthData.highChol === '1';
               
               const innerCardStyle = { padding: '16px', border: '2px solid #e2e8f0', borderRadius: '12px' };
               const outOfRangeStyle = { fontSize: '0.75rem', backgroundColor: '#fee2e2', color: '#b91c1c', padding: '4px 8px', borderRadius: '6px', fontWeight: '600' };
               const normalStyle = { fontSize: '0.75rem', backgroundColor: '#dcfce7', color: '#15803d', padding: '4px 8px', borderRadius: '6px', fontWeight: '600' };
+              const hasValidBmi = Number.isFinite(bmi);
+              const hasFastingGlucose = Number.isFinite(glucoseBefore);
+              const hasPostprandialGlucose = Number.isFinite(glucoseAfter);
 
               return (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
@@ -113,22 +123,28 @@ export function HomePage({ user }) {
                   <div style={innerCardStyle}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
                       <span style={{ color: '#334155', fontWeight: '500' }}>Body Mass Index (BMI)</span>
-                      {(bmi < 18.5 || bmi > 24.9) ? <span style={outOfRangeStyle}>Out of Range</span> : <span style={normalStyle}>Normal</span>}
+                      {hasValidBmi ? ((bmi < 18.5 || bmi > 24.9) ? <span style={outOfRangeStyle}>Out of Range</span> : <span style={normalStyle}>Normal</span>) : <span style={normalStyle}>N/A</span>}
                     </div>
                     <p style={{ fontSize: '1.5rem', margin: '0 0 4px 0', fontWeight: (bmi < 18.5 || bmi > 24.9) ? '700' : '400', color: '#0f172a' }}>
-                      {bmi.toFixed(1)} kg/m²
+                      {hasValidBmi ? `${bmi.toFixed(1)} kg/m²` : 'N/A'}
                     </p>
                     <p style={{ fontSize: '0.875rem', color: '#64748b', margin: '0 0 4px 0' }}>
                       Normal Range: <span style={{ fontWeight: '600' }}>18.5 - 24.9 kg/m²</span>
                     </p>
-                    {bmi < 18.5 && <p style={{ fontSize: '0.75rem', color: '#ea580c', margin: 0, fontWeight: '500' }}>Status: Underweight</p>}
-                    {bmi >= 18.5 && bmi <= 24.9 && <p style={{ fontSize: '0.75rem', color: '#16a34a', margin: 0, fontWeight: '500' }}>Status: Normal</p>}
-                    {bmi > 24.9 && bmi <= 29.9 && <p style={{ fontSize: '0.75rem', color: '#ca8a04', margin: 0, fontWeight: '500' }}>Status: Overweight</p>}
-                    {bmi > 29.9 && <p style={{ fontSize: '0.75rem', color: '#dc2626', margin: 0, fontWeight: '500' }}>Status: Obese</p>}
+                    {hasValidBmi ? (
+                      <>
+                        {bmi < 18.5 && <p style={{ fontSize: '0.75rem', color: '#ea580c', margin: 0, fontWeight: '500' }}>Status: Underweight</p>}
+                        {bmi >= 18.5 && bmi <= 24.9 && <p style={{ fontSize: '0.75rem', color: '#16a34a', margin: 0, fontWeight: '500' }}>Status: Normal</p>}
+                        {bmi > 24.9 && bmi <= 29.9 && <p style={{ fontSize: '0.75rem', color: '#ca8a04', margin: 0, fontWeight: '500' }}>Status: Overweight</p>}
+                        {bmi > 29.9 && <p style={{ fontSize: '0.75rem', color: '#dc2626', margin: 0, fontWeight: '500' }}>Status: Obese</p>}
+                      </>
+                    ) : (
+                      <p style={{ fontSize: '0.75rem', color: '#64748b', margin: 0, fontWeight: '500' }}>Status: Not enough data</p>
+                    )}
                   </div>
 
                   {/* Fasting Glucose */}
-                  {glucoseBefore && (
+                  {hasFastingGlucose && (
                     <div style={innerCardStyle}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
                         <span style={{ color: '#334155', fontWeight: '500' }}>Fasting Blood Glucose</span>
@@ -148,7 +164,7 @@ export function HomePage({ user }) {
                   )}
 
                   {/* Postprandial Glucose */}
-                  {glucoseAfter && (
+                  {hasPostprandialGlucose && (
                     <div style={innerCardStyle}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
                         <span style={{ color: '#334155', fontWeight: '500' }}>Postprandial Glucose</span>
@@ -202,6 +218,34 @@ export function HomePage({ user }) {
             })()}
           </Card>
 
+          {/* Impacting Factors */}
+          <Card style={{ padding: '32px', backgroundColor: '#ffffff', borderRadius: '16px', boxShadow: '0 10px 15px -5px rgba(0,0,0,0.05)', border: '1px solid #f1f5f9' }}>
+            <h3 style={{ textAlign: 'center', marginBottom: '24px', fontSize: '1.5rem', fontWeight: '700', ...purplePinkGradientText }}>
+              Impacting Factors
+            </h3>
+            {actionableRiskFactors.length > 0 ? (
+              <div style={{ display: 'grid', gap: '16px' }}>
+                {actionableRiskFactors.map((factor, index) => (
+                  <div key={index} style={{ padding: '16px', borderRadius: '12px', border: '1px solid #f3e8ff', background: 'linear-gradient(135deg, #fff, #faf5ff)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
+                      <div>
+                        <p style={{ margin: 0, fontWeight: 700, color: '#0f172a' }}>{factor.feature}</p>
+                        <p style={{ margin: '4px 0 0 0', color: '#475569', fontSize: '0.875rem' }}>
+                          Impact score: {factor.magnitude.toFixed(4)}
+                        </p>
+                      </div>
+                      <span style={{ color: '#dc2626', fontWeight: 700 }}>↑</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p style={{ textAlign: 'center', color: '#64748b', margin: 0 }}>
+                No modifiable risk-increasing factors were identified for this assessment.
+              </p>
+            )}
+          </Card>
+
           {/* Risk Assessment */}
           <Card style={{ padding: '32px', background: 'linear-gradient(135deg, #ffffff, #faf5ff)', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', border: '2px solid #f3e8ff', borderRadius: '16px' }}>
             <h3 style={{ textAlign: 'center', marginBottom: '32px', fontSize: '1.5rem', fontWeight: '700', ...purplePinkGradientText }}>
@@ -211,7 +255,7 @@ export function HomePage({ user }) {
           </Card>
 
           {/* Personalized Advice */}
-          <AdviceSection riskScore={user.riskScore} userData={user.healthData} />
+          <AdviceSection riskScore={user.riskScore} userData={user.healthData} riskFactors={user.riskFactors} />
 
           {/* Quick Actions */}
           <Card style={{ padding: '32px', background: 'linear-gradient(135deg, #faf5ff, #fdf2f8, #fff7ed)', border: '2px solid #e9d5ff', borderRadius: '16px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}>

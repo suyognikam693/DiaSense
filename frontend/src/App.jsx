@@ -30,12 +30,13 @@ export default function App() {
     setUser(null);
   };
 
-  const updateUserData = (healthData, riskScore) => {
+  const updateUserData = (healthData, riskScore, riskFactors = []) => {
     if (user) {
       setUser({
         ...user,
         healthData,
         riskScore,
+        riskFactors,
       });
     }
   };
@@ -131,6 +132,7 @@ export default function App() {
               <AdviceSection
                 riskScore={user?.riskScore}
                 userData={user?.healthData}
+                riskFactors={user?.riskFactors}
               />
             </ProtectedRoute>
           }

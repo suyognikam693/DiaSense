@@ -1,0 +1,181 @@
+{
+  "confidence": 0.9999994039535522,
+  "features": [
+    {
+      "feature": "GenHlth",
+      "value": -0.0228042904453487,
+      "shap_class1": 0.16208487035842076,
+      "rank": 1,
+      "pct_abs_class1": 34.06,
+      "direction_class1": "supports class 1"
+    },
+    {
+      "feature": "Age",
+      "value": 1.2585487618183189,
+      "shap_class1": 0.0894839587638588,
+      "rank": 2,
+      "pct_abs_class1": 18.804,
+      "direction_class1": "supports class 1"
+    },
+    {
+      "feature": "BMI",
+      "value": 0.0477622184310537,
+      "shap_class1": 0.05580820241923523,
+      "rank": 3,
+      "pct_abs_class1": 11.727,
+      "direction_class1": "supports class 1"
+    },
+    {
+      "feature": "Income",
+      "value": 0.5626037601174765,
+      "shap_class1": 0.050957471189891156,
+      "rank": 4,
+      "pct_abs_class1": 10.708,
+      "direction_class1": "supports class 1"
+    },
+    {
+      "feature": "Veggies",
+      "value": -2.6840467640740084,
+      "shap_class1": -0.035339469307166756,
+      "rank": 5,
+      "pct_abs_class1": 7.426,
+      "direction_class1": "pushes toward class 0"
+    },
+    {
+      "feature": "MentHlth",
+      "value": -0.0623699823108527,
+      "shap_class1": 0.033803447156359044,
+      "rank": 6,
+      "pct_abs_class1": 7.103,
+      "direction_class1": "supports class 1"
+    },
+    {
+      "feature": "DiffWalk",
+      "value": -0.244917516994975,
+      "shap_class1": 0.008208054643425075,
+      "rank": 7,
+      "pct_abs_class1": 1.725,
+      "direction_class1": "supports class 1"
+    },
+    {
+      "feature": "HighChol",
+      "value": -0.7607554403010933,
+      "shap_class1": -0.00732355281832496,
+      "rank": 8,
+      "pct_abs_class1": 1.539,
+      "direction_class1": "pushes toward class 0"
+    },
+    {
+      "feature": "Sex",
+      "value": 1.0548362156329183,
+      "shap_class1": 0.007199441590270611,
+      "rank": 9,
+      "pct_abs_class1": 1.513,
+      "direction_class1": "supports class 1"
+    },
+    {
+      "feature": "PhysActivity",
+      "value": 0.4025819579573679,
+      "shap_class1": 0.005221756386175312,
+      "rank": 10,
+      "pct_abs_class1": 1.097,
+      "direction_class1": "supports class 1"
+    },
+    {
+      "feature": "PhysHlth",
+      "value": -0.35127398369065,
+      "shap_class1": 0.0051787209337908246,
+      "rank": 11,
+      "pct_abs_class1": 1.088,
+      "direction_class1": "supports class 1"
+    },
+    {
+      "feature": "HighBP",
+      "value": 1.3098438144568096,
+      "shap_class1": 0.0034630340847680344,
+      "rank": 12,
+      "pct_abs_class1": 0.728,
+      "direction_class1": "supports class 1"
+    },
+    {
+      "feature": "HvyAlcoholConsump",
+      "value": -0.237419320985054,
+      "shap_class1": 0.0030179106140250794,
+      "rank": 13,
+      "pct_abs_class1": 0.634,
+      "direction_class1": "supports class 1"
+    },
+    {
+      "feature": "HeartDiseaseorAttack",
+      "value": -0.1918260458124779,
+      "shap_class1": 0.0020366456730698673,
+      "rank": 14,
+      "pct_abs_class1": 0.428,
+      "direction_class1": "supports class 1"
+    },
+    {
+      "feature": "Fruits",
+      "value": 0.7453369382524216,
+      "shap_class1": 0.0020147601557603764,
+      "rank": 15,
+      "pct_abs_class1": 0.423,
+      "direction_class1": "supports class 1"
+    },
+    {
+      "feature": "Smoker",
+      "value": -0.7771787262793448,
+      "shap_class1": 0.0016222630967172396,
+      "rank": 16,
+      "pct_abs_class1": 0.341,
+      "direction_class1": "supports class 1"
+    },
+    {
+      "feature": "FamilyDiabetes",
+      "value": -0.0851186073046302,
+      "shap_class1": -0.0013754880552490588,
+      "rank": 17,
+      "pct_abs_class1": 0.289,
+      "direction_class1": "pushes toward class 0"
+    },
+    {
+      "feature": "CholCheck",
+      "value": 0.1416277340649917,
+      "shap_class1": 0.0010856590663259798,
+      "rank": 18,
+      "pct_abs_class1": 0.228,
+      "direction_class1": "supports class 1"
+    },
+    {
+      "feature": "Education",
+      "value": 0.8637549904857356,
+      "shap_class1": -0.0006616356310253877,
+      "rank": 19,
+      "pct_abs_class1": 0.139,
+      "direction_class1": "pushes toward class 0"
+    },
+    {
+      "feature": "NoDocbcCost",
+      "value": -0.1483539745044961,
+      "shap_class1": 0.0,
+      "rank": 20,
+      "pct_abs_class1": 0.0,
+      "direction_class1": "pushes toward class 0"
+    },
+    {
+      "feature": "Stroke",
+      "value": -0.0992748049703685,
+      "shap_class1": 0.0,
+      "rank": 21,
+      "pct_abs_class1": 0.0,
+      "direction_class1": "pushes toward class 0"
+    },
+    {
+      "feature": "AnyHealthcare",
+      "value": 0.0857192580787574,
+      "shap_class1": 0.0,
+      "rank": 22,
+      "pct_abs_class1": 0.0,
+      "direction_class1": "pushes toward class 0"
+    }
+  ]
+}

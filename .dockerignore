@@ -1,0 +1,22 @@
+# Node and Python build artifacts
+node_modules
+frontend/node_modules
+backend/node_modules
+
+# Python caches and venvs
+ml_n_xai/__pycache__
+**/*.pyc
+ml_n_xai/venv
+.venv
+
+# Build outputs
+frontend/dist
+frontend/build
+dist
+
+# Local env and logs
+.env
+*.log
+
+# Git metadata
+.git

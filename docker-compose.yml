@@ -1,0 +1,46 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: diasense
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    image: node:18
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/diasense
+      DB_HOST: db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: diasense
+      DB_PORT: 5432
+      NODE_ENV: development
+    depends_on:
+      - db
+    command: sh -c "npm install --silent && npm run dev"
+
+  ml:
+    image: python:3.10
+    working_dir: /app
+    volumes:
+      - ./ml_n_xai:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    command: sh -c "pip install --no-cache-dir fastapi uvicorn xgboost shap pandas scikit-learn && uvicorn main:app --host 0.0.0.0 --port 8000"
+
+volumes:
+  db_data:

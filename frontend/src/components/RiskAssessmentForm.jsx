@@ -5,6 +5,7 @@ import { Label } from './ui/label';
 import { Button } from './ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Moon, Utensils, Activity, Droplet, Users, Brain, Scale, Ruler, AlertCircle, Heart, Stethoscope, Apple, Cigarette, DollarSign, GraduationCap, Loader2 } from 'lucide-react';
+import { buildRiskRecommendations, getActionableRiskFactors } from './riskInsights';
 
 // Notice we are now accepting onSubmit and isSaving to match ProfilePage!
 export function RiskAssessmentForm({ initialData, onSubmit, isSaving }) {
@@ -56,10 +57,46 @@ export function RiskAssessmentForm({ initialData, onSubmit, isSaving }) {
   };
 
   const isFormValid = () => {
-    const requiredFields = Object.entries(formData).filter(([key]) => 
-      key !== 'glucoseLevelBeforeFasting' && key !== 'glucoseLevelAfterFasting'
-    );
-    return requiredFields.every(([, value]) => value !== '');
+    const requiredFields = [
+      'age',
+      'sex',
+      'ageCategory',
+      'educationLevel',
+      'incomeLevel',
+      'weight',
+      'height',
+      'highBP',
+      'highChol',
+      'cholCheck',
+      'stroke',
+      'heartDiseaseOrAttack',
+      'diffWalk',
+      'smoker',
+      'physicalActivity',
+      'fruits',
+      'veggies',
+      'heavyAlcoholConsump',
+      'sleepHours',
+      'sleepQuality',
+      'mealsPerDay',
+      'sugarIntake',
+      'exerciseFrequency',
+      'familyHistory',
+      'stressLevel',
+      'polyuria',
+      'polydipsia',
+      'polyphagia',
+      'genHealth',
+      'mentalHealth',
+      'physHealth',
+      'healthcareCoverage',
+      'noDocBcCost',
+    ];
+
+    return requiredFields.every((field) => {
+      const value = formData[field];
+      return value !== undefined && value !== null && String(value).trim() !== '';
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -593,22 +630,52 @@ export function RiskAssessmentForm({ initialData, onSubmit, isSaving }) {
           <div className="mt-8 border-t pt-6">
             <h3 className="text-xl font-semibold mb-4 flex items-center gap-2 text-gray-800">
               <Brain className="w-6 h-6 text-purple-600" />
-              Why this prediction? (Top Factors)
+              Why this prediction? (Top Increasing Factors)
             </h3>
             <div className="space-y-4">
-              {result.top_factors.map((factor, idx) => (
-                <div key={idx} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                  <span className="font-medium text-gray-700">{factor.feature}</span>
-                  <div className="flex items-center gap-2">
-                    <span className={`font-bold ${factor.impact === 'Increases Risk' ? 'text-red-500' : 'text-green-500'}`}>
-                      {factor.impact === 'Increases Risk' ? '↑' : '↓'}
-                    </span>
-                    <span className="text-sm text-gray-500">
-                      Impact Score: {factor.magnitude.toFixed(4)}
-                    </span>
+              {getActionableRiskFactors(result.top_factors).length > 0 ? (
+                getActionableRiskFactors(result.top_factors).map((factor, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <span className="font-medium text-gray-700">{factor.feature}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-red-500">↑</span>
+                      <span className="text-sm text-gray-500">
+                        Impact Score: {factor.magnitude.toFixed(4)}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="text-gray-500">
+                  No modifiable risk-increasing factors were identified in this report.
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-8 border-t pt-6">
+            <h3 className="text-xl font-semibold mb-4 flex items-center gap-2 text-gray-800">
+              <Heart className="w-6 h-6 text-pink-600" />
+              Recommended Actions
+            </h3>
+            <div className="space-y-4">
+              {buildRiskRecommendations(result.top_factors).length > 0 ? (
+                buildRiskRecommendations(result.top_factors).map((item, idx) => (
+                  <div key={idx} className="p-4 bg-pink-50 rounded-lg border border-pink-100">
+                    <div className="flex items-center justify-between gap-4 mb-2">
+                      <span className="font-semibold text-gray-800">{item.title}</span>
+                      <span className="text-xs px-2 py-1 rounded-full bg-pink-100 text-pink-700 font-medium">
+                        {item.feature}
+                      </span>
+                    </div>
+                    <p className="text-gray-600 text-sm">{item.description}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500">
+                  Your current report does not contain any actionable risk factors to target right now.
+                </p>
+              )}
             </div>
           </div>
         </Card>

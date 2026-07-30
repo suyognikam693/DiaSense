@@ -45,7 +45,7 @@ export function ProfilePage({ user, onUpdateUserData, setUser, onNavigateToHome 
               highChol: a.high_chol ? "1" : "0",
               stroke: a.stroke ? "1" : "0",
               heartDiseaseOrAttack: a.heart_disease ? "1" : "0",
-
+          
               bmi: a.bmi,
               glucoseLevelBeforeFasting: a.glucose_before_fasting,
               glucoseLevelAfterFasting: a.glucose_after_fasting,
@@ -176,7 +176,7 @@ export function ProfilePage({ user, onUpdateUserData, setUser, onNavigateToHome 
 
     const savedAssessment = await response.json();
 
-    onUpdateUserData(data, savedAssessment.risk_score);
+    onUpdateUserData(data, savedAssessment.risk_score, predictionResult?.top_factors || []);
 
     toast.success("Health assessment saved successfully!");
 

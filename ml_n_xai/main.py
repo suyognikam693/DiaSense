@@ -6,6 +6,7 @@ import shap
 import pandas as pd
 import pickle
 import contextlib
+import traceback
 
 model = None
 explainer = None
@@ -16,8 +17,25 @@ FEATURE_COLUMNS = [
     "HighBP", "HighChol", "CholCheck", "BMI", "Smoker", "Stroke", 
     "HeartDiseaseorAttack", "PhysActivity", "Fruits", "Veggies", 
     "HvyAlcoholConsump", "AnyHealthcare", "NoDocbcCost", "GenHlth", 
-    "MentHlth", "PhysHlth", "DiffWalk", "Sex", "Age", "Education", "Income"
+    "MentHlth", "PhysHlth", "DiffWalk", "Sex", "Age", "Education", "Income", "FamilyDiabetes"
 ]
+
+
+def parse_family_diabetes(value):
+    if value in (None, "", 0, "0"):
+        return 0.0
+    if isinstance(value, (int, float)):
+        return float(value)
+
+    normalized = str(value).strip().lower()
+    if normalized in {"none", "no", "0", "false"}:
+        return 0.0
+    if normalized in {"one", "one parent/sibling", "single", "1"}:
+        return 1.0
+    if normalized in {"both", "both parents/multiple relatives", "multiple", "2"}:
+        return 2.0
+
+    return 0.0
 
 @contextlib.asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -26,6 +44,15 @@ async def lifespan(app: FastAPI):
     # 1. Load the model
     with open("xgboost_model.pkl", "rb") as f:
         model = pickle.load(f)
+        # Compatibility: some pickled XGBClassifier objects saved with
+        # older/newer xgboost versions may be missing sklearn-wrapper
+        # attributes expected by `predict_proba()` and scikit-learn API.
+        # Set sensible defaults when missing to avoid AttributeError.
+        try:
+            if not hasattr(model, 'use_label_encoder'):
+                setattr(model, 'use_label_encoder', False)
+        except Exception:
+            pass
         
     # 2. Load your scaler (REQUIRED because your training data was scaled)
     # with open("scaler.pkl", "rb") as f:
@@ -66,7 +93,8 @@ async def predict_risk(data: dict):
             "Sex": float(data.get("sex", 0)),
             "Age": float(data.get("ageCategory", 1)), 
             "Education": float(data.get("educationLevel", 4)),
-            "Income": float(data.get("incomeLevel", 5))
+            "Income": float(data.get("incomeLevel", 5)),
+            "FamilyDiabetes": parse_family_diabetes(data.get("familyHistory", 0))
         }
 
         # Create DataFrame in exact order
@@ -80,8 +108,39 @@ async def predict_risk(data: dict):
         # once you add your scaler.pkl, otherwise predictions will be wrong!
         df_final = df_raw 
 
-        # 3. Predict Probability
-        pred_proba = float(model.predict_proba(df_final)[0][1])
+        # 3. Predict Probability (robust to pickled model shape/version mismatches)
+        def predict_proba_safe(mdl, df):
+            # Prefer sklearn wrapper if available
+            try:
+                proba = mdl.predict_proba(df)
+                return proba
+            except Exception:
+                # Fallback: use underlying Booster/Booster-like object
+                try:
+                    booster = None
+                    if hasattr(mdl, 'get_booster'):
+                        booster = mdl.get_booster()
+                    elif hasattr(mdl, 'booster_'):
+                        booster = mdl.booster_
+                    else:
+                        booster = mdl
+
+                    dmat = xgb.DMatrix(df)
+                    preds = booster.predict(dmat)
+                    # preds may be shape (n,) probabilities for binary
+                    import numpy as _np
+                    preds = _np.array(preds)
+                    if preds.ndim == 1:
+                        # convert to [[1-p, p], ...]
+                        proba = _np.vstack([1 - preds, preds]).T
+                    else:
+                        proba = preds
+                    return proba
+                except Exception:
+                    raise
+
+        proba_array = predict_proba_safe(model, df_final)
+        pred_proba = float(proba_array[0][1])
         
         # 4. Calculate SHAP Values
         shap_vals = explainer(df_final)
@@ -111,4 +170,5 @@ async def predict_risk(data: dict):
         }
 
     except Exception as e:
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
